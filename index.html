@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>cama café 台元科技店 - 園區線上外送點餐</title>
+  <!-- 載入 LINE LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root {
+      --cama-yellow: #C49A45;
+      --cama-dark: #3A2B1D;
+      --bg-gray: #F8F9FA;
+      --border-color: #E9ECEF;
+      --text-main: #212529;
+      --text-muted: #6C757D;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg-gray); color: var(--text-main); padding-bottom: 90px; }
+    
+/* 頂部橫幅 (cama 亮黃色背景) */
+    .header {
+      background-color: #FFC20E; /* cama 經典活力黃 */
+      color: #3A2B1D;
+      padding: 18px 16px;
+      border-bottom: 3px solid #E0A600; /* 質感立體底線 */
+    }
+    .header h1 { 
+      font-size: 18px; 
+      font-weight: 800;
+      display: flex; 
+      align-items: center; 
+      gap: 8px; 
+      color: #3A2B1D;
+    }
+    .header p { 
+      font-size: 12px; 
+      font-weight: 600;
+      color: #5D432E; /* 易讀的深琥珀棕 */
+      margin-top: 5px; 
+      line-height: 1.4; 
+    }
+
+    /* 分類 Tabs */
+    .tabs-wrapper {
+      display: flex;
+      overflow-x: auto;
+      background: #fff;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .tabs-wrapper::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 0 0 auto;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-btn.active {
+      color: var(--cama-yellow);
+      border-bottom-color: var(--cama-yellow);
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--text-muted);
+      padding: 14px 16px 6px 16px;
+    }
+
+    .card {
+      background: #fff;
+      margin: 0 12px 12px 12px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* 菜單品項 */
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .item-info .item-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
+    .item-info .item-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .item-info .item-price { font-size: 14px; color: var(--cama-yellow); font-weight: bold; margin-top: 4px; }
+    
+    /* 計數器 */
+    .counter { display: flex; align-items: center; gap: 8px; }
+    .btn-qty {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--cama-dark);
+    }
+    .btn-qty:active { background: #eee; }
+    .qty-num { font-size: 14px; font-weight: bold; min-width: 18px; text-align: center; }
+
+    /* 表單元件 */
+    .form-group { margin-bottom: 12px; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #495057; }
+    .form-group label span { color: #E03131; }
+    .form-control {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      font-size: 14px;
+      background-color: #fff;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--cama-yellow); }
+
+    /* 底部浮動結帳列 */
+    .footer-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid var(--border-color);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+      z-index: 999;
+    }
+    .total-price { font-size: 13px; color: var(--text-muted); }
+    .total-price span { font-size: 18px; font-weight: bold; color: var(--cama-yellow); }
+    .btn-submit {
+      background: var(--cama-yellow);
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部資訊 -->
+  <div class="header">
+    <h1>☕ cama café 台元科技店</h1>
+    <p>📍 八期會館直送｜平日 07:30 - 17:30｜外送直達各期 1F 大廳外送桌</p>
+  </div>
+
+  <!-- 分類導覽切換 -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchCategory('all')">全部品項</button>
+    <button class="tab-btn" onclick="switchCategory('sharing')">會議分享壺</button>
+    <button class="tab-btn" onclick="switchCategory('coffee')">現烘咖啡</button>
+    <button class="tab-btn" onclick="switchCategory('tea')">純茶與奶茶</button>
+    <button class="tab-btn" onclick="switchCategory('sandwich')">現烤三明治</button>
+    <button class="tab-btn" onclick="switchCategory('toast')">雙片生吐司</button>
+  </div>
+
+  <!-- 步驟 1: 菜單選擇 -->
+  <div class="section-title">📋 步驟 1：選擇外送餐點 (飲品預設大杯 L)</div>
+  <div class="card" id="menu-container">
+    <!-- 菜單由 JS 動態生成 -->
+  </div>
+
+ <!-- 步驟 2: 外送地點 (含詳細門牌地址) -->
+  <div class="section-title">🏢 步驟 2：台元外送地點</div>
+  <div class="card">
+    <div class="form-group">
+      <label>園區棟別與地址 <span>*</span></label>
+      <select id="building" class="form-control">
+        <option value="">-- 請選擇台元園區大樓與門牌 --</option>
+        <optgroup label="【八期】">
+          <option value="8期 會館大廳 1F (台元二街7號)">台元八期 會館大廳 1F (台元二街7號)</option>
+          <option value="8期 研發大樓 1F外送桌 (台元二街1號)">台元八期 研發大樓 1F外送桌 (台元二街1號)</option>
+          <option value="8期 廠辦大樓 1F外送桌 (台元二街9號)">台元八期 廠辦大樓 1F外送桌 (台元二街9號)</option>
+        </optgroup>
+        <optgroup label="【五期 / 六期】">
+          <option value="5期 M/N棟 1F外送桌 (台元一街8號)">台元五期 M/N棟 1F外送桌 (台元一街8號)</option>
+          <option value="5期 O/P棟 1F外送桌 (台元一街8號)">台元五期 O/P棟 1F外送桌 (台元一街8號)</option>
+          <option value="6期 Q/R棟 1F外送桌 (台元一街10號)">台元六期 Q/R棟 1F外送桌 (台元一街10號)</option>
+        </optgroup>
+        <optgroup label="【三期】">
+          <option value="3期 G/H棟 1F外送桌 (台元街38號)">台元三期 G/H棟 1F外送桌 (台元街38號)</option>
+          <option value="3期 I棟 1F外送桌 (台元街38號)">台元三期 I棟 1F外送桌 (台元街38號)</option>
+        </optgroup>
+        <optgroup label="【一期 / 二期】">
+          <option value="1期 A/B棟 1F大廳 (台元街26號)">台元一期 A/B棟 1F大廳 (台元街26號)</option>
+          <option value="1期 服務中心/銀行棟 1F (台元街28號)">台元一期 服務中心/銀行棟 1F (台元街28號)</option>
+          <option value="2期 C/D棟 1F大廳 (台元街20號)">台元二期 C/D棟 1F大廳 (台元街20號)</option>
+          <option value="2期 E/F棟 1F大廳 (台元街36號)">台元二期 E/F棟 1F大廳 (台元街36號)</option>
+        </optgroup>
+        <optgroup label="【其他】">
+          <option value="其他棟別 (請於下方備註填寫地址與樓層)">其他棟別 (請於下方備註填寫地址與樓層)</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <!-- 步驟 3: 聯絡資訊與統編 -->
+  <div class="section-title">👤 步驟 3：聯絡人與統編</div>
+  <div class="card">
+    <div class="form-group">
+      <label>訂購人稱呼 <span>*</span></label>
+      <input type="text" id="custName" class="form-control" placeholder="例：王小明 / 艾咪">
+    </div>
+    <div class="form-group">
+      <label>分機 / 連絡電話 <span>*</span></label>
+      <input type="text" id="custPhone" class="form-control" placeholder="例：#6723 或 0912-345678">
+    </div>
+    <div class="form-group">
+      <label>統一編號 (報帳報銷必填)</label>
+      <input type="text" id="vatNumber" class="form-control" placeholder="8 碼數字 (選填)" maxlength="8">
+    </div>
+    <div class="form-group">
+      <label>客製需求備註</label>
+      <input type="text" id="orderNote" class="form-control" placeholder="例：拿鐵微糖、分享壺需10個紙杯">
+    </div>
+  </div>
+
+  <!-- 底部固定按鈕 -->
+  <div class="footer-bar">
+    <div class="total-price">
+      已選 <span id="total-qty">0</span> 份｜預估 <span id="total-amount">$0</span>
+    </div>
+    <button class="btn-submit" id="submit-btn" onclick="submitOrder()">確認送出外送單</button>
+  </div>
+
+  <script>
+    // 完整的菜單資料庫 (依最新價目表與餐食設定)
+    const menuItems = [
+      // 會議分享壺
+      { id: 'share_pot', cat: 'sharing', name: '現萃會議分享壺', desc: '約 8-10 人份 (附紙杯、糖包、奶精)', price: 650, qty: 0 },
+      
+      // 現烘咖啡 (預設 L 大杯計價)
+      { id: 'cama_latte', cat: 'coffee', name: 'CAMA 金獎拿鐵 (L)', desc: '經典堅果甜感鮮乳咖啡', price: 115, qty: 0 },
+      { id: 'cama_ame', cat: 'coffee', name: 'CAMA 金獎美式 (L)', desc: '清爽黑巧克力香氣', price: 90, qty: 0 },
+      { id: 'champ_latte', cat: 'coffee', name: '雙冠莊園精品拿鐵 (L)', desc: 'COE 冠軍莊園豆，濃烈熱帶水果風味', price: 135, qty: 0 },
+      { id: 'champ_ame', cat: 'coffee', name: '雙冠莊園精品美式 (L)', desc: '採用 COE 冠軍莊園豆', price: 110, qty: 0 },
+      { id: 'rich_milk', cat: 'coffee', name: '極厚乳三層咖啡 (L)', desc: '濃郁極厚乳多層次口感', price: 135, qty: 0 },
+      { id: 'oat_latte', cat: 'coffee', name: '燕麥拿鐵 (L)', desc: 'OATLY / OATSIDE 經典燕麥奶', price: 135, qty: 0 },
+      { id: 'sea_salt_ame', cat: 'coffee', name: '奶蓋海鹽美式 (L)', desc: '細緻綿密鹹甜海鹽奶蓋', price: 110, qty: 0 },
+      { id: 'camellia_latte', cat: 'coffee', name: '山茶花輕拿鐵 (L)', desc: '優雅山茶花香氣特調', price: 125, qty: 0 },
+      { id: 'mocha', cat: 'coffee', name: '摩卡咖啡 (L)', desc: '醇厚可可與拿鐵完美結合', price: 140, qty: 0 },
+
+      // 茶飲與歐蕾
+      { id: 'black_milk_tea', cat: 'tea', name: '鮮奶熟香紅茶 (L)', desc: '熟香紅茶搭配優質鮮乳', price: 75, qty: 0 },
+      { id: 'roasted_milk_tea', cat: 'tea', name: '鮮奶栗香焙煎茶 (L)', desc: '焙茶炭香與濃郁乳香', price: 75, qty: 0 },
+      { id: 'black_tea', cat: 'tea', name: '熟香紅茶 (L)', desc: '甘醇順口經典紅茶', price: 55, qty: 0 },
+      { id: 'roasted_tea', cat: 'tea', name: '栗香焙煎茶 (L)', desc: '深焙低澀感焙茶', price: 55, qty: 0 },
+      { id: 'milk_foam_black', cat: 'tea', name: '奶蓋熟香紅茶 (L)', desc: '鹹甜海鹽奶蓋紅茶', price: 70, qty: 0 },
+      { id: 'matcha_au_lait', cat: 'tea', name: '抹茶歐蕾 (L)', desc: '日本抹茶香濃乳飲', price: 95, qty: 0 },
+      { id: 'choco_au_lait', cat: 'tea', name: '可可歐蕾 (L)', desc: '濃純巧克力特調', price: 120, qty: 0 },
+
+      // 現烤三明治
+      { id: 'sw_egg', cat: 'sandwich', name: '蛋沙拉吐司 (五辛蛋奶素)', desc: '現烤香酥吐司佐經典蛋沙拉', price: 70, qty: 0 },
+      { id: 'sw_pork_egg', cat: 'sandwich', name: '肉蛋吐司', desc: '人氣特製烤肉排加煎蛋', price: 85, qty: 0 },
+      { id: 'sw_truffle_egg', cat: 'sandwich', name: '松露嫩蛋吐司 (五辛蛋奶素)', desc: '奢華松露香氣嫩煎蛋', price: 95, qty: 0 },
+      { id: 'sw_cheese', cat: 'sandwich', name: '香濃熔岩起司吐司 (蛋奶素)', desc: '熱騰騰牽絲雙層起司', price: 95, qty: 0 },
+      { id: 'sw_beef', cat: 'sandwich', name: '法式芥末籽烤牛肉吐司', desc: '特調芥末籽醬佐嫩烤牛肉', price: 95, qty: 0 },
+      { id: 'sw_tuna', cat: 'sandwich', name: '鮪魚玉米吐司', desc: '現拌鮮甜鮪魚玉米', price: 95, qty: 0 },
+
+      // 雙片生吐司 (均一價 $65)
+      { id: 'toast_sweet_potato', cat: 'toast', name: '凍餡台農57號蜂蜜地瓜生吐司', desc: '2片1份，台農57號蜜香地瓜餡', price: 65, qty: 0 },
+      { id: 'toast_taro_pork', cat: 'toast', name: '凍餡芋頭肉鬆生吐司', desc: '2片1份，鹹甜芋泥肉鬆絕配', price: 65, qty: 0 },
+      { id: 'toast_choco', cat: 'toast', name: '凍餡生巧克力生吐司', desc: '2片1份，法式濃郁生巧克力', price: 65, qty: 0 },
+      { id: 'toast_roasted_tea', cat: 'toast', name: '職人手炒焙茶奶酥生吐司', desc: '2片1份，焙茶香脆奶酥', price: 65, qty: 0 }
+    ];
+
+    // 請替換為你的 LIFF ID (從 LINE Developers 取得)
+    const MY_LIFF_ID = "YOUR_LIFF_ID";
+    let currentCategory = 'all';
+
+    // 渲染菜單
+    function renderMenu() {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = '';
+
+      const filtered = currentCategory === 'all' 
+        ? menuItems 
+        : menuItems.filter(item => item.cat === currentCategory);
+
+      filtered.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'menu-item';
+        div.innerHTML = `
+          <div class="item-info">
+            <div class="item-name">${item.name}</div>
+            <div class="item-desc">${item.desc}</div>
+            <div class="item-price">$${item.price}</div>
+          </div>
+          <div class="counter">
+            <button class="btn-qty" onclick="changeQty('${item.id}', -1)">-</button>
+            <span class="qty-num" id="qty-${item.id}">${item.qty}</span>
+            <button class="btn-qty" onclick="changeQty('${item.id}', 1)">+</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // 分類切換
+    function switchCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderMenu();
+    }
+
+    // 杯數加減
+    function changeQty(id, delta) {
+      const item = menuItems.find(i => i.id === id);
+      if (item && item.qty + delta >= 0) {
+        item.qty += delta;
+        const el = document.getElementById(`qty-${id}`);
+        if (el) el.innerText = item.qty;
+        updateSummary();
+      }
+    }
+
+    // 更新總金額
+    function updateSummary() {
+      let totalQty = 0;
+      let totalAmount = 0;
+      menuItems.forEach(item => {
+        totalQty += item.qty;
+        totalAmount += item.qty * item.price;
+      });
+      document.getElementById('total-qty').innerText = totalQty;
+      document.getElementById('total-amount').innerText = '$' + totalAmount;
+    }
+
+    // 初始化 LIFF
+    window.onload = function() {
+      renderMenu();
+      liff.init({ liffId: MY_LIFF_ID })
+        .then(() => {
+          if (liff.isLoggedIn()) {
+            liff.getProfile().then(profile => {
+              if (profile.displayName && !document.getElementById('custName').value) {
+                document.getElementById('custName').value = profile.displayName;
+              }
+            });
+          }
+        })
+        .catch(err => {
+          console.error("LIFF Init Error: ", err);
+        });
+    };
+
+    // 點擊確認送出外送單
+    function submitOrder() {
+      const selected = menuItems.filter(i => i.qty > 0);
+      if (selected.length === 0) {
+        alert("請至少選擇 1 項外送餐點！");
+        return;
+      }
+
+      const building = document.getElementById('building').value;
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const vat = document.getElementById('vatNumber').value.trim();
+      const note = document.getElementById('orderNote').value.trim();
+
+      if (!building) {
+        alert("請選擇送達的台元園區大樓位置！");
+        return;
+      }
+      if (!name) {
+        alert("請填寫訂購人稱呼！");
+        return;
+      }
+      if (!phone) {
+        alert("請填寫分機或聯絡電話！");
+        return;
+      }
+      if (vat && !/^[0-9]{8}$/.test(vat)) {
+        alert("統一編號格式錯誤，請輸入 8 碼數字！");
+        return;
+      }
+
+      const itemStrings = selected.map(i => `${i.name}*${i.qty}`);
+
+      // 組成與現有 n8n 正則表達式相符的文字格式
+      let messageText = `#外送\n`;
+      messageText += `訂購人：${name}\n`;
+      messageText += `分機/電話：${phone}\n`;
+      messageText += `棟別位置：${building}\n`;
+      messageText += `品項：${itemStrings.join('、')}\n`;
+      if (vat) messageText += `統編：${vat}\n`;
+      if (note) messageText += `備註：${note}`;
+
+      document.getElementById('submit-btn').disabled = true;
+      document.getElementById('submit-btn').innerText = "訂單送出中...";
+
+      // 呼叫 LINE LIFF API 代表客戶發送訊息
+      if (liff.isInClient()) {
+        liff.sendMessages([{
+          type: 'text',
+          text: messageText
+        }]).then(() => {
+          liff.closeWindow(); // 成功送出後自動關閉頁面
+        }).catch(err => {
+          alert("送出失敗：" + err.message);
+          document.getElementById('submit-btn').disabled = false;
+          document.getElementById('submit-btn').innerText = "確認送出外送單";
+        });
+      } else {
+        alert("【測試模式】非 LINE 內部開啟，送出內容如下：\n\n" + messageText);
+        document.getElementById('submit-btn').disabled = false;
+        document.getElementById('submit-btn').innerText = "確認送出外送單";
+      }
+    }
+  </script>
+</body>
+</html>
