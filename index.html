@@ -29,6 +29,18 @@
     .header h1 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: #3A2B1D; }
     .header p { font-size: 12px; font-weight: 600; color: #5D432E; margin-top: 4px; line-height: 1.4; }
 
+    /* 外送規則提醒橫幅 */
+    .rule-banner {
+      background: #FFF3CD;
+      border-left: 4px solid #D98200;
+      color: #856404;
+      padding: 10px 14px;
+      margin: 10px 12px 0 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
     /* 分類 Tabs 橫向滑動列 */
     .tabs-wrapper {
       display: flex;
@@ -239,19 +251,26 @@
   <!-- 頂部資訊 -->
   <div class="header">
     <h1>☕ cama café 台元科技店</h1>
-    <p>📍 八期會館直送｜平日 07:30 - 17:30｜外送直達各期 1F 大廳外送桌[cite: 1]</p>
+    <p>📍 八期會館直送｜平日 07:30 - 17:30｜外送直達各期 1F 大廳外送桌</p>
   </div>
 
-  <!-- 分類導覽切換 (依 Uber Eats 菜單分類整合) -->
+  <!-- 外送規範提醒 -->
+  <div class="rule-banner">
+    ⚠️ <strong>園區外送須知：</strong><br>
+    1. 需滿 <strong>10 杯（份）以上</strong> 起送（或點購「會議桶裝飲品」1 桶即達標準）[cite: 6]。<br>
+    2. 尖峰時段 <strong>12:00 ~ 14:00 門市現場繁忙恕無法外送</strong>，敬請提早或預約午後班次[cite: 6]。
+  </div>
+
+  <!-- 分類導覽切換 (Uber Eats 原版 7 大分類) -->
   <div class="tabs-wrapper">
-    <button class="tab-btn active" onclick="switchCategory('all')">全部品項</button>
-    <button class="tab-btn" onclick="switchCategory('barrel')">會議桶裝飲品</button>
-    <button class="tab-btn" onclick="switchCategory('coffee')">經典現烘咖啡</button>
-    <button class="tab-btn" onclick="switchCategory('specialty')">雙冠莊園精品</button>
-    <button class="tab-btn" onclick="switchCategory('tea')">純茶與厚奶茶</button>
-    <button class="tab-btn" onclick="switchCategory('au_lait')">風味歐蕾</button>
-    <button class="tab-btn" onclick="switchCategory('sandwich')">現烤熱壓三明治</button>
-    <button class="tab-btn" onclick="switchCategory('toast')">生吐司與點心</button>
+    <button class="tab-btn active" data-cat="all" onclick="switchCategory('all')">全部品項</button>
+    <button class="tab-btn" data-cat="barrel" onclick="switchCategory('barrel')">會議桶裝飲品</button>
+    <button class="tab-btn" data-cat="coffee" onclick="switchCategory('coffee')">經典現烘咖啡</button>
+    <button class="tab-btn" data-cat="specialty" onclick="switchCategory('specialty')">雙冠莊園精品</button>
+    <button class="tab-btn" data-cat="tea" onclick="switchCategory('tea')">純茶與厚奶茶</button>
+    <button class="tab-btn" data-cat="au_lait" onclick="switchCategory('au_lait')">風味歐蕾</button>
+    <button class="tab-btn" data-cat="sandwich" onclick="switchCategory('sandwich')">現烤熱壓三明治</button>
+    <button class="tab-btn" data-cat="toast" onclick="switchCategory('toast')">生吐司與點心</button>
   </div>
 
   <!-- 步驟 1: 菜單選擇 -->
@@ -266,9 +285,31 @@
     <div style="font-size: 13px; color: #ADB5BD; text-align: center; padding: 12px 0;">尚未選擇餐點，請點擊上方「+ 選擇」</div>
   </div>
 
-  <!-- 步驟 2: 外送地點 -->
-  <div class="section-title">🏢 步驟 2：台元外送地點</div>
+  <!-- 步驟 2: 外送時間與地點 -->
+  <div class="section-title">🏢 步驟 2：外送時間與園區地點</div>
   <div class="card">
+    <div class="form-group">
+      <label>期望送達時間 <span>* (尖峰 12:00~14:00 不提供外送)</span></label>
+      <select id="deliveryTime" class="form-control">
+        <option value="">-- 請選擇期望送達時間 --</option>
+        <option value="08:30">08:30 (晨會早茶)</option>
+        <option value="09:00">09:00</option>
+        <option value="09:30">09:30</option>
+        <option value="10:00">10:00</option>
+        <option value="10:30">10:30</option>
+        <option value="11:00">11:00 (午前最後班次)</option>
+        <option value="11:30">11:30 (午前最後班次)</option>
+        <!-- 12:00 ~ 14:00 尖峰不外送，直接排除 -->
+        <option value="14:00">14:00 (午後第一班次)</option>
+        <option value="14:30">14:30</option>
+        <option value="15:00">15:00 (熱門午茶時段)</option>
+        <option value="15:30">15:30 (熱門午茶時段)</option>
+        <option value="16:00">16:00</option>
+        <option value="16:30">16:30</option>
+        <option value="17:00">17:00</option>
+      </select>
+    </div>
+
     <div class="form-group">
       <label>園區棟別與門牌 <span>*</span></label>
       <select id="building" class="form-control">
@@ -384,16 +425,16 @@
   </div>
 
   <script>
-    // 依 Uber Eats cama café 台元科技店菜單完整配置之品項清單
+    // 門市完整菜單配置清單
     const menuItems = [
-      // 1. 會議桶裝飲品 6,000ml (美式無糖度，茶飲支援糖度調整)[cite: 8]
+      // 1. 會議桶裝飲品 6,000ml (約 25-30 人份，訂購 1 桶即達出貨標準)[cite: 8]
       { id: 'barrel_ame', cat: 'barrel', name: '美式咖啡 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包、奶精[cite: 1, 8]', price: 1400, hasCustom: true, allowSugar: false },
       { id: 'barrel_black_tea', cat: 'barrel', name: '熟香紅茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1200, hasCustom: true, allowSugar: true },
       { id: 'barrel_roasted_tea', cat: 'barrel', name: '栗香焙煎茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1200, hasCustom: true, allowSugar: true },
       { id: 'barrel_herbal_tea', cat: 'barrel', name: '花草茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1100, hasCustom: true, allowSugar: true },
       { id: 'barrel_berry_tea', cat: 'barrel', name: '莓果茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1100, hasCustom: true, allowSugar: true },
       
-      // 2. 經典現烘咖啡 (支援冷熱+冰塊，無糖度選項)
+      // 2. 經典現烘咖啡 (支援冷熱+冰塊，無糖度)
       { id: 'cama_latte', cat: 'coffee', name: 'CAMA 經典拿鐵 (L)', desc: '經典堅果甜感鮮乳咖啡，店內招牌首選', price: 115, hasCustom: true, allowSugar: false },
       { id: 'cama_ame', cat: 'coffee', name: 'CAMA 經典黑咖啡 (L)', desc: '清爽黑巧克力與堅果香氣', price: 90, hasCustom: true, allowSugar: false },
       { id: 'cappuccino', cat: 'coffee', name: '卡布奇諾 (L)', desc: '濃密奶泡佐香醇肉桂香氣', price: 115, hasCustom: true, allowSugar: false },
@@ -443,7 +484,7 @@
       { id: 'toast_roasted_tea', cat: 'toast', name: '職人手炒焙茶奶酥生吐司', desc: '2片1份，炭香焙茶香脆奶酥', price: 65, hasCustom: false }
     ];
 
-    // 已綁定你的專屬 LIFF ID[cite: 1]
+    // 已綁定專屬 LIFF ID[cite: 1]
     const MY_LIFF_ID = "2011673074-haQCo3WA";
     
     let currentCategory = 'all';
@@ -484,8 +525,9 @@
     // 分類導覽切換
     function switchCategory(cat) {
       currentCategory = cat;
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-cat') === cat);
+      });
       renderMenu();
     }
 
@@ -540,25 +582,27 @@
     function selectTemp(temp) {
       selectedTemp = temp;
       document.querySelectorAll('#tempGroup .chip-btn').forEach(b => b.classList.remove('selected'));
-      event.target.classList.add('selected');
-
       if (temp === '熱') {
+        document.getElementById('opt-temp-hot').classList.add('selected');
         document.getElementById('iceGroup').style.display = 'none';
       } else {
+        document.getElementById('opt-temp-ice').classList.add('selected');
         document.getElementById('iceGroup').style.display = 'block';
       }
     }
 
     function selectIce(ice) {
       selectedIce = ice;
-      document.querySelectorAll('#iceGroup .chip-btn').forEach(b => b.classList.remove('selected'));
-      event.target.classList.add('selected');
+      document.querySelectorAll('#iceGroup .chip-btn').forEach(b => {
+        b.classList.toggle('selected', b.innerText.includes(ice));
+      });
     }
 
     function selectSugar(sugar) {
       selectedSugar = sugar;
-      document.querySelectorAll('#sugarGroup .chip-btn').forEach(b => b.classList.remove('selected'));
-      event.target.classList.add('selected');
+      document.querySelectorAll('#sugarGroup .chip-btn').forEach(b => {
+        b.classList.toggle('selected', b.innerText.includes(sugar));
+      });
     }
 
     function changeModalQty(delta) {
@@ -664,10 +708,38 @@
         });
     };
 
-    // 送出外送訂單
+    // 送出外送訂單 (嚴格檢核：滿10份起送、排除12-14點)
     function submitOrder() {
       if (cart.length === 0) {
-        alert("請至少選擇 1 項外送餐點！");
+        alert("請先選擇要外送的餐點！");
+        return;
+      }
+
+      // 會議桶裝飲品 1 桶相當於 25~30 杯份量，折算為 10 份權重以符合出貨標準[cite: 8]
+      const totalUnits = cart.reduce((sum, item) => {
+        const originalItem = menuItems.find(m => m.id === item.id);
+        const isBarrel = originalItem && originalItem.cat === 'barrel';
+        return sum + (isBarrel ? item.qty * 10 : item.qty);
+      }, 0);
+
+      // 檢核門檻 1：滿 10 杯/份以上出貨
+      if (totalUnits < 10) {
+        alert(`⚠️ 目前累計餐點為 ${totalUnits} 份，未達外送門檻！\n\n台元園區外送需滿 10 杯（份）以上方可出貨。\n（點購「會議桶裝飲品」1 桶即符合出單標準）`);
+        return;
+      }
+
+      // 檢核門檻 2：送達時間
+      const deliveryTime = document.getElementById('deliveryTime').value;
+      if (!deliveryTime) {
+        alert("請選擇「期望送達時間」！");
+        document.getElementById('deliveryTime').focus();
+        return;
+      }
+
+      // 二次防呆：檢查是否落於 12:00 ~ 14:00 (選單已預設排除)
+      const hour = parseInt(deliveryTime.split(':')[0], 10);
+      if (hour >= 12 && hour < 14) {
+        alert("⚠️ 門市 12:00 ~ 14:00 現場人潮尖峰，恕不提供外送服務，請改選其他時段！");
         return;
       }
 
@@ -702,11 +774,12 @@
         return `${item.name}*${item.qty}`;
       });
 
-      // 符合既有 n8n 正則表達式格式[cite: 1]
+      // 完整符合既有 n8n 正則表達式抓取格式[cite: 1, 8]
       let messageText = `#外送\n`;
       messageText += `訂購人：${name}\n`;
       messageText += `分機/電話：${phone}\n`;
       messageText += `棟別位置：${building}\n`;
+      messageText += `期望送達時間：${deliveryTime}\n`;
       messageText += `品項：${itemStrings.join('、')}\n`;
       if (vat) messageText += `統編：${vat}\n`;
       if (note) messageText += `備註：${note}`;
@@ -726,7 +799,7 @@
           document.getElementById('submit-btn').innerText = "確認送出外送單";
         });
       } else {
-        alert("【測試模式】送出內容如下：\n\n" + messageText);
+        alert("【瀏覽器預覽】送出內容如下：\n\n" + messageText);
         document.getElementById('submit-btn').disabled = false;
         document.getElementById('submit-btn').innerText = "確認送出外送單";
       }
