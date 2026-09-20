@@ -3,45 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>cama café 台元科技店 - 園區線上外送點餐</title>
+  <title>cama café 台元科技店 - 園區外送點餐</title>
   <!-- 載入 LINE LIFF SDK -->
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
     :root {
-      --cama-yellow: #C49A45;
+      --cama-yellow: #FFC20E;
       --cama-dark: #3A2B1D;
+      --cama-brown: #5D432E;
       --bg-gray: #F8F9FA;
       --border-color: #E9ECEF;
       --text-main: #212529;
       --text-muted: #6C757D;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    body { background-color: var(--bg-gray); color: var(--text-main); padding-bottom: 90px; }
+    body { background-color: var(--bg-gray); color: var(--text-main); padding-bottom: 95px; }
     
-/* 頂部橫幅 (cama 亮黃色背景) */
+    /* 頂部橫幅 */
     .header {
-      background-color: #FFC20E; /* cama 經典活力黃 */
+      background-color: #FFC20E;
       color: #3A2B1D;
-      padding: 18px 16px;
-      border-bottom: 3px solid #E0A600; /* 質感立體底線 */
+      padding: 16px;
+      border-bottom: 3px solid #E0A600;
     }
-    .header h1 { 
-      font-size: 18px; 
-      font-weight: 800;
-      display: flex; 
-      align-items: center; 
-      gap: 8px; 
-      color: #3A2B1D;
-    }
-    .header p { 
-      font-size: 12px; 
-      font-weight: 600;
-      color: #5D432E; /* 易讀的深琥珀棕 */
-      margin-top: 5px; 
-      line-height: 1.4; 
-    }
+    .header h1 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: #3A2B1D; }
+    .header p { font-size: 12px; font-weight: 600; color: #5D432E; margin-top: 4px; line-height: 1.4; }
 
-    /* 分類 Tabs */
+    /* 分類 Tabs 橫向滑動列 */
     .tabs-wrapper {
       display: flex;
       overflow-x: auto;
@@ -49,23 +37,24 @@
       border-bottom: 1px solid var(--border-color);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 90;
     }
     .tabs-wrapper::-webkit-scrollbar { display: none; }
     .tab-btn {
       flex: 0 0 auto;
-      padding: 12px 16px;
+      padding: 12px 14px;
       border: none;
       background: none;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--text-muted);
       cursor: pointer;
       border-bottom: 2px solid transparent;
     }
     .tab-btn.active {
-      color: var(--cama-yellow);
-      border-bottom-color: var(--cama-yellow);
+      color: #D98200;
+      border-bottom-color: #FFC20E;
+      font-weight: 800;
     }
 
     .section-title {
@@ -88,31 +77,42 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px 0;
+      padding: 11px 0;
       border-bottom: 1px solid var(--border-color);
     }
     .menu-item:last-child { border-bottom: none; }
-    .item-info .item-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
-    .item-info .item-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .item-info .item-price { font-size: 14px; color: var(--cama-yellow); font-weight: bold; margin-top: 4px; }
+    .item-info { flex: 1; padding-right: 12px; }
+    .item-info .item-name { font-size: 14.5px; font-weight: 600; color: var(--text-main); }
+    .item-info .item-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+    .item-info .item-price { font-size: 14px; color: #D98200; font-weight: bold; margin-top: 3px; }
     
-    /* 計數器 */
-    .counter { display: flex; align-items: center; gap: 8px; }
-    .btn-qty {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      border: 1px solid var(--border-color);
-      background: #fff;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .btn-add {
+      background-color: #FFF9E6;
+      border: 1px solid #FFC20E;
+      color: #8A5A00;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 20px;
       cursor: pointer;
-      color: var(--cama-dark);
+      flex-shrink: 0;
     }
-    .btn-qty:active { background: #eee; }
-    .qty-num { font-size: 14px; font-weight: bold; min-width: 18px; text-align: center; }
+    .btn-add:active { background-color: #FFECA8; }
+
+    /* 已選餐點清單 */
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px dashed var(--border-color);
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-title { font-size: 13.5px; font-weight: 600; color: var(--cama-dark); }
+    .cart-item-spec { font-size: 11.5px; color: #8A5A00; background: #FFF9E6; padding: 1px 6px; border-radius: 4px; display: inline-block; margin-top: 2px; }
+    .cart-item-right { display: flex; align-items: center; gap: 10px; }
+    .cart-item-price { font-size: 13.5px; font-weight: bold; color: var(--text-main); }
+    .btn-del { background: none; border: none; color: #E03131; font-size: 16px; cursor: pointer; padding: 4px 6px; }
 
     /* 表單元件 */
     .form-group { margin-bottom: 12px; }
@@ -128,14 +128,88 @@
       background-color: #fff;
       outline: none;
     }
-    .form-control:focus { border-color: var(--cama-yellow); }
+    .form-control:focus { border-color: #FFC20E; }
 
-    /* 底部浮動結帳列 */
+    /* 規格彈窗 Bottom Sheet */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: flex-end;
+      z-index: 1000;
+    }
+    .modal-sheet {
+      background: #fff;
+      width: 100%;
+      border-radius: 16px 16px 0 0;
+      padding: 20px 16px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.2s ease-out;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+    .modal-title { font-size: 16.5px; font-weight: 800; color: var(--cama-dark); }
+    .modal-price { font-size: 15px; font-weight: bold; color: #D98200; margin-top: 2px; }
+    .btn-close-modal { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; }
+
+    .opt-group { margin-bottom: 15px; }
+    .opt-group-label { font-size: 13px; font-weight: 700; color: #495057; margin-bottom: 8px; }
+    .chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip-btn {
+      padding: 6px 13px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      background: #F8F9FA;
+      font-size: 13px;
+      font-weight: 600;
+      color: #495057;
+      cursor: pointer;
+    }
+    .chip-btn.selected {
+      border-color: #FFC20E;
+      background: #FFF9E6;
+      color: #8A5A00;
+      font-weight: 800;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+    .modal-counter { display: flex; align-items: center; gap: 10px; }
+    .modal-btn-qty {
+      width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-color);
+      background: #fff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-qty-num { font-size: 16px; font-weight: bold; min-width: 20px; text-align: center; }
+    .btn-confirm-add {
+      background: #FFC20E;
+      color: #3A2B1D;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* 底部固定結帳列 */
     .footer-bar {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
       background: #fff;
       border-top: 1px solid var(--border-color);
       padding: 12px 16px;
@@ -143,18 +217,18 @@
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-      z-index: 999;
+      z-index: 99;
     }
     .total-price { font-size: 13px; color: var(--text-muted); }
-    .total-price span { font-size: 18px; font-weight: bold; color: var(--cama-yellow); }
+    .total-price span { font-size: 18px; font-weight: bold; color: #D98200; }
     .btn-submit {
-      background: var(--cama-yellow);
-      color: #fff;
+      background: #FFC20E;
+      color: #3A2B1D;
       border: none;
       border-radius: 24px;
-      padding: 10px 20px;
+      padding: 10px 22px;
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 800;
       cursor: pointer;
     }
     .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
@@ -165,17 +239,19 @@
   <!-- 頂部資訊 -->
   <div class="header">
     <h1>☕ cama café 台元科技店</h1>
-    <p>📍 八期會館直送｜平日 07:30 - 17:30｜外送直達各期 1F 大廳外送桌</p>
+    <p>📍 八期會館直送｜平日 07:30 - 17:30｜外送直達各期 1F 大廳外送桌[cite: 1]</p>
   </div>
 
-  <!-- 分類導覽切換 -->
+  <!-- 分類導覽切換 (依 Uber Eats 菜單分類整合) -->
   <div class="tabs-wrapper">
     <button class="tab-btn active" onclick="switchCategory('all')">全部品項</button>
-    <button class="tab-btn" onclick="switchCategory('sharing')">會議分享壺</button>
-    <button class="tab-btn" onclick="switchCategory('coffee')">現烘咖啡</button>
-    <button class="tab-btn" onclick="switchCategory('tea')">純茶與奶茶</button>
-    <button class="tab-btn" onclick="switchCategory('sandwich')">現烤三明治</button>
-    <button class="tab-btn" onclick="switchCategory('toast')">雙片生吐司</button>
+    <button class="tab-btn" onclick="switchCategory('barrel')">會議桶裝飲品</button>
+    <button class="tab-btn" onclick="switchCategory('coffee')">經典現烘咖啡</button>
+    <button class="tab-btn" onclick="switchCategory('specialty')">雙冠莊園精品</button>
+    <button class="tab-btn" onclick="switchCategory('tea')">純茶與厚奶茶</button>
+    <button class="tab-btn" onclick="switchCategory('au_lait')">風味歐蕾</button>
+    <button class="tab-btn" onclick="switchCategory('sandwich')">現烤熱壓三明治</button>
+    <button class="tab-btn" onclick="switchCategory('toast')">生吐司與點心</button>
   </div>
 
   <!-- 步驟 1: 菜單選擇 -->
@@ -184,11 +260,17 @@
     <!-- 菜單由 JS 動態生成 -->
   </div>
 
- <!-- 步驟 2: 外送地點 (含詳細門牌地址) -->
+  <!-- 已選擇的外送清單 -->
+  <div class="section-title">🛒 已選擇餐點明細</div>
+  <div class="card" id="cart-container">
+    <div style="font-size: 13px; color: #ADB5BD; text-align: center; padding: 12px 0;">尚未選擇餐點，請點擊上方「+ 選擇」</div>
+  </div>
+
+  <!-- 步驟 2: 外送地點 -->
   <div class="section-title">🏢 步驟 2：台元外送地點</div>
   <div class="card">
     <div class="form-group">
-      <label>園區棟別與地址 <span>*</span></label>
+      <label>園區棟別與門牌 <span>*</span></label>
       <select id="building" class="form-control">
         <option value="">-- 請選擇台元園區大樓與門牌 --</option>
         <optgroup label="【八期】">
@@ -235,11 +317,11 @@
     </div>
     <div class="form-group">
       <label>客製需求備註</label>
-      <input type="text" id="orderNote" class="form-control" placeholder="例：拿鐵微糖、分享壺需10個紙杯">
+      <input type="text" id="orderNote" class="form-control" placeholder="例：桶裝需附30個紙杯、拿鐵微厚乳">
     </div>
   </div>
 
-  <!-- 底部固定按鈕 -->
+  <!-- 底部固定結帳列 -->
   <div class="footer-bar">
     <div class="total-price">
       已選 <span id="total-qty">0</span> 份｜預估 <span id="total-amount">$0</span>
@@ -247,52 +329,133 @@
     <button class="btn-submit" id="submit-btn" onclick="submitOrder()">確認送出外送單</button>
   </div>
 
+  <!-- 規格選擇彈窗 Bottom Sheet -->
+  <div class="modal-overlay" id="specModal">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modalItemName">飲品名稱</div>
+          <div class="modal-price" id="modalItemPrice">$0</div>
+        </div>
+        <button class="btn-close-modal" onclick="closeModal()">✕</button>
+      </div>
+
+      <!-- 溫度選擇 -->
+      <div class="opt-group" id="tempGroup">
+        <div class="opt-group-label">溫度選擇</div>
+        <div class="chips-container">
+          <button class="chip-btn selected" id="opt-temp-ice" onclick="selectTemp('冰')">🧊 冰飲</button>
+          <button class="chip-btn" id="opt-temp-hot" onclick="selectTemp('熱')">☀️ 熱飲</button>
+        </div>
+      </div>
+
+      <!-- 冰塊選擇 (僅冰飲顯示) -->
+      <div class="opt-group" id="iceGroup">
+        <div class="opt-group-label">冰塊選擇</div>
+        <div class="chips-container">
+          <button class="chip-btn selected" onclick="selectIce('微冰')">微冰 (推薦)</button>
+          <button class="chip-btn" onclick="selectIce('少冰')">少冰</button>
+          <button class="chip-btn" onclick="selectIce('去冰')">去冰</button>
+          <button class="chip-btn" onclick="selectIce('正常冰')">正常冰</button>
+        </div>
+      </div>
+
+      <!-- 糖度選擇 (茶飲與歐蕾類顯示) -->
+      <div class="opt-group" id="sugarGroup">
+        <div class="opt-group-label">糖度調整</div>
+        <div class="chips-container">
+          <button class="chip-btn selected" onclick="selectSugar('無糖')">無糖 (健康)</button>
+          <button class="chip-btn" onclick="selectSugar('微糖')">微糖 (推薦)</button>
+          <button class="chip-btn" onclick="selectSugar('半糖')">半糖</button>
+          <button class="chip-btn" onclick="selectSugar('正常糖')">正常糖</button>
+        </div>
+      </div>
+
+      <!-- 彈窗計數與確認加入 -->
+      <div class="modal-footer">
+        <div class="modal-counter">
+          <button class="modal-btn-qty" onclick="changeModalQty(-1)">-</button>
+          <span class="modal-qty-num" id="modalQty">1</span>
+          <button class="modal-btn-qty" onclick="changeModalQty(1)">+</button>
+        </div>
+        <button class="btn-confirm-add" onclick="confirmAddToCart()">加入外送清單</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // 完整的菜單資料庫 (依最新價目表與餐食設定)
+    // 依 Uber Eats cama café 台元科技店菜單完整配置之品項清單
     const menuItems = [
-      // 會議分享壺
-      { id: 'share_pot', cat: 'sharing', name: '現萃會議分享壺', desc: '約 8-10 人份 (附紙杯、糖包、奶精)', price: 650, qty: 0 },
+      // 1. 會議桶裝飲品 6,000ml (美式無糖度，茶飲支援糖度調整)[cite: 8]
+      { id: 'barrel_ame', cat: 'barrel', name: '美式咖啡 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包、奶精[cite: 1, 8]', price: 1400, hasCustom: true, allowSugar: false },
+      { id: 'barrel_black_tea', cat: 'barrel', name: '熟香紅茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1200, hasCustom: true, allowSugar: true },
+      { id: 'barrel_roasted_tea', cat: 'barrel', name: '栗香焙煎茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1200, hasCustom: true, allowSugar: true },
+      { id: 'barrel_herbal_tea', cat: 'barrel', name: '花草茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1100, hasCustom: true, allowSugar: true },
+      { id: 'barrel_berry_tea', cat: 'barrel', name: '莓果茶 (桶裝 6,000ml)', desc: '約 25-30 人份，附紙杯、糖包[cite: 1, 8]', price: 1100, hasCustom: true, allowSugar: true },
       
-      // 現烘咖啡 (預設 L 大杯計價)
-      { id: 'cama_latte', cat: 'coffee', name: 'CAMA 金獎拿鐵 (L)', desc: '經典堅果甜感鮮乳咖啡', price: 115, qty: 0 },
-      { id: 'cama_ame', cat: 'coffee', name: 'CAMA 金獎美式 (L)', desc: '清爽黑巧克力香氣', price: 90, qty: 0 },
-      { id: 'champ_latte', cat: 'coffee', name: '雙冠莊園精品拿鐵 (L)', desc: 'COE 冠軍莊園豆，濃烈熱帶水果風味', price: 135, qty: 0 },
-      { id: 'champ_ame', cat: 'coffee', name: '雙冠莊園精品美式 (L)', desc: '採用 COE 冠軍莊園豆', price: 110, qty: 0 },
-      { id: 'rich_milk', cat: 'coffee', name: '極厚乳三層咖啡 (L)', desc: '濃郁極厚乳多層次口感', price: 135, qty: 0 },
-      { id: 'oat_latte', cat: 'coffee', name: '燕麥拿鐵 (L)', desc: 'OATLY / OATSIDE 經典燕麥奶', price: 135, qty: 0 },
-      { id: 'sea_salt_ame', cat: 'coffee', name: '奶蓋海鹽美式 (L)', desc: '細緻綿密鹹甜海鹽奶蓋', price: 110, qty: 0 },
-      { id: 'camellia_latte', cat: 'coffee', name: '山茶花輕拿鐵 (L)', desc: '優雅山茶花香氣特調', price: 125, qty: 0 },
-      { id: 'mocha', cat: 'coffee', name: '摩卡咖啡 (L)', desc: '醇厚可可與拿鐵完美結合', price: 140, qty: 0 },
+      // 2. 經典現烘咖啡 (支援冷熱+冰塊，無糖度選項)
+      { id: 'cama_latte', cat: 'coffee', name: 'CAMA 經典拿鐵 (L)', desc: '經典堅果甜感鮮乳咖啡，店內招牌首選', price: 115, hasCustom: true, allowSugar: false },
+      { id: 'cama_ame', cat: 'coffee', name: 'CAMA 經典黑咖啡 (L)', desc: '清爽黑巧克力與堅果香氣', price: 90, hasCustom: true, allowSugar: false },
+      { id: 'cappuccino', cat: 'coffee', name: '卡布奇諾 (L)', desc: '濃密奶泡佐香醇肉桂香氣', price: 115, hasCustom: true, allowSugar: false },
+      { id: 'vanilla_latte', cat: 'coffee', name: '香草風味拿鐵 (L)', desc: '法式香草甜香與義式鮮乳拿鐵', price: 125, hasCustom: true, allowSugar: false },
+      { id: 'hazelnut_latte', cat: 'coffee', name: '榛果風味拿鐵 (L)', desc: '濃郁烘烤榛果香氣特調', price: 125, hasCustom: true, allowSugar: false },
+      { id: 'caramel_macchiato', cat: 'coffee', name: '焦糖瑪琪朵 (L)', desc: '香草鮮奶注入濃縮，淋上香濃焦糖醬', price: 135, hasCustom: true, allowSugar: false },
+      { id: 'mocha', cat: 'coffee', name: '摩卡咖啡 (L)', desc: '特調深黑可可與濃醇拿鐵完美融合', price: 140, hasCustom: true, allowSugar: false },
+      { id: 'sea_salt_ame', cat: 'coffee', name: '奶蓋海鹽黑咖啡 (L)', desc: '綿密微鹹甜海鹽起司奶蓋', price: 110, hasCustom: true, allowSugar: false },
+      { id: 'camellia_latte', cat: 'coffee', name: '山茶花輕拿鐵 (L)', desc: '典雅山茶花香，清甜柔順新體驗', price: 125, hasCustom: true, allowSugar: false },
+      { id: 'rich_milk_latte', cat: 'coffee', name: '極厚乳三層咖啡 (L)', desc: '濃厚乳香層層堆疊，奶控最愛', price: 135, hasCustom: true, allowSugar: false },
+      { id: 'oat_latte', cat: 'coffee', name: '燕麥拿鐵 (L)', desc: '嚴選 OATLY 經典燕麥奶，植物奶首選', price: 135, hasCustom: true, allowSugar: false },
+      { id: 'honey_oat_latte', cat: 'coffee', name: '蜂蜜燕麥拿鐵 (L)', desc: '清香蜂蜜點綴馥郁燕麥拿鐵', price: 145, hasCustom: true, allowSugar: false },
 
-      // 茶飲與歐蕾
-      { id: 'black_milk_tea', cat: 'tea', name: '鮮奶熟香紅茶 (L)', desc: '熟香紅茶搭配優質鮮乳', price: 75, qty: 0 },
-      { id: 'roasted_milk_tea', cat: 'tea', name: '鮮奶栗香焙煎茶 (L)', desc: '焙茶炭香與濃郁乳香', price: 75, qty: 0 },
-      { id: 'black_tea', cat: 'tea', name: '熟香紅茶 (L)', desc: '甘醇順口經典紅茶', price: 55, qty: 0 },
-      { id: 'roasted_tea', cat: 'tea', name: '栗香焙煎茶 (L)', desc: '深焙低澀感焙茶', price: 55, qty: 0 },
-      { id: 'milk_foam_black', cat: 'tea', name: '奶蓋熟香紅茶 (L)', desc: '鹹甜海鹽奶蓋紅茶', price: 70, qty: 0 },
-      { id: 'matcha_au_lait', cat: 'tea', name: '抹茶歐蕾 (L)', desc: '日本抹茶香濃乳飲', price: 95, qty: 0 },
-      { id: 'choco_au_lait', cat: 'tea', name: '可可歐蕾 (L)', desc: '濃純巧克力特調', price: 120, qty: 0 },
+      // 3. 雙冠莊園精品系列 (冷熱+冰塊，無糖度)
+      { id: 'estate_latte', cat: 'specialty', name: '雙冠莊園精品拿鐵 (L)', desc: 'COE 冠軍莊園豆，濃烈熱帶水果風味', price: 135, hasCustom: true, allowSugar: false },
+      { id: 'estate_ame', cat: 'specialty', name: '雙冠莊園精品美式 (L)', desc: '冠軍莊園豆萃取，明亮花果香氣', price: 110, hasCustom: true, allowSugar: false },
+      { id: 'estate_yirgacheffe', cat: 'specialty', name: '衣索比亞 耶加雪菲 (L)', desc: '花香、柑橘、檸檬清爽高雅酸香', price: 130, hasCustom: true, allowSugar: false },
+      { id: 'estate_mandheling', cat: 'specialty', name: '印尼 黃金曼特寧 (L)', desc: '厚實濃郁草本與黑巧克力香氣', price: 130, hasCustom: true, allowSugar: false },
+      { id: 'estate_guatemala', cat: 'specialty', name: '瓜地馬拉 薇薇特南果 (L)', desc: '核果、焦糖、柑橘圓潤甜感', price: 130, hasCustom: true, allowSugar: false },
 
-      // 現烤三明治
-      { id: 'sw_egg', cat: 'sandwich', name: '蛋沙拉吐司 (五辛蛋奶素)', desc: '現烤香酥吐司佐經典蛋沙拉', price: 70, qty: 0 },
-      { id: 'sw_pork_egg', cat: 'sandwich', name: '肉蛋吐司', desc: '人氣特製烤肉排加煎蛋', price: 85, qty: 0 },
-      { id: 'sw_truffle_egg', cat: 'sandwich', name: '松露嫩蛋吐司 (五辛蛋奶素)', desc: '奢華松露香氣嫩煎蛋', price: 95, qty: 0 },
-      { id: 'sw_cheese', cat: 'sandwich', name: '香濃熔岩起司吐司 (蛋奶素)', desc: '熱騰騰牽絲雙層起司', price: 95, qty: 0 },
-      { id: 'sw_beef', cat: 'sandwich', name: '法式芥末籽烤牛肉吐司', desc: '特調芥末籽醬佐嫩烤牛肉', price: 95, qty: 0 },
-      { id: 'sw_tuna', cat: 'sandwich', name: '鮪魚玉米吐司', desc: '現拌鮮甜鮪魚玉米', price: 95, qty: 0 },
+      // 4. 純茶與厚奶茶 (支援冷熱+冰塊+糖度調整)
+      { id: 'fresh_milk_black_tea', cat: 'tea', name: '鮮奶熟香紅茶 (L)', desc: '熟成紅茶與優質鮮乳，醇香順口', price: 75, hasCustom: true, allowSugar: true },
+      { id: 'fresh_milk_roasted_tea', cat: 'tea', name: '鮮奶栗香焙煎茶 (L)', desc: '炭焙茶香與溫潤鮮乳，溫厚回甘', price: 75, hasCustom: true, allowSugar: true },
+      { id: 'fresh_milk_oolong', cat: 'tea', name: '鮮奶微韻烏龍茶 (L)', desc: '高山微韻烏龍搭配香濃鮮乳', price: 75, hasCustom: true, allowSugar: true },
+      { id: 'black_tea', cat: 'tea', name: '熟香紅茶 (L)', desc: '經典焙火紅茶，甘甜不澀口', price: 55, hasCustom: true, allowSugar: true },
+      { id: 'roasted_tea', cat: 'tea', name: '栗香焙煎茶 (L)', desc: '日式深焙焙煎茶，焙火甘香濃烈', price: 55, hasCustom: true, allowSugar: true },
+      { id: 'oolong_tea', cat: 'tea', name: '微韻烏龍茶 (L)', desc: '清甜回甘高山烏龍原茶', price: 55, hasCustom: true, allowSugar: true },
+      { id: 'milk_foam_black_tea', cat: 'tea', name: '海鹽奶蓋熟香紅茶 (L)', desc: '鹹甜起司海鹽奶蓋，層次極佳', price: 70, hasCustom: true, allowSugar: true },
 
-      // 雙片生吐司 (均一價 $65)
-      { id: 'toast_sweet_potato', cat: 'toast', name: '凍餡台農57號蜂蜜地瓜生吐司', desc: '2片1份，台農57號蜜香地瓜餡', price: 65, qty: 0 },
-      { id: 'toast_taro_pork', cat: 'toast', name: '凍餡芋頭肉鬆生吐司', desc: '2片1份，鹹甜芋泥肉鬆絕配', price: 65, qty: 0 },
-      { id: 'toast_choco', cat: 'toast', name: '凍餡生巧克力生吐司', desc: '2片1份，法式濃郁生巧克力', price: 65, qty: 0 },
-      { id: 'toast_roasted_tea', cat: 'toast', name: '職人手炒焙茶奶酥生吐司', desc: '2片1份，焙茶香脆奶酥', price: 65, qty: 0 }
+      // 5. 風味歐蕾 (支援冷熱+冰塊+糖度調整)
+      { id: 'matcha_au_lait', cat: 'au_lait', name: '日本抹茶歐蕾 (L)', desc: '嚴選日式細緻抹茶佐溫醇鮮乳', price: 95, hasCustom: true, allowSugar: true },
+      { id: 'choco_au_lait', cat: 'au_lait', name: '法式濃醇可可歐蕾 (L)', desc: '深濃苦甜可可，午茶療癒推薦', price: 120, hasCustom: true, allowSugar: true },
+      { id: 'brown_sugar_milk', cat: 'au_lait', name: '黑糖鮮奶 (L)', desc: '在地手炒香濃黑糖佐純鮮乳', price: 95, hasCustom: true, allowSugar: true },
+
+      // 6. 現烤熱壓三明治 (輕食：直接加入)
+      { id: 'sw_pork_egg', cat: 'sandwich', name: '人氣特製肉蛋吐司', desc: '門市招牌！主廚醃醬里肌肉排加嫩煎蛋', price: 85, hasCustom: false },
+      { id: 'sw_egg_salad', cat: 'sandwich', name: '經典蛋沙拉吐司 (五辛蛋奶素)', desc: '新鮮水煮蛋拌特調沙拉醬，清爽無負擔', price: 70, hasCustom: false },
+      { id: 'sw_truffle_egg', cat: 'sandwich', name: '黑松露嫩蛋吐司 (五辛蛋奶素)', desc: '義大利黑松露香氣嫩煎蛋，奢華美味', price: 95, hasCustom: false },
+      { id: 'sw_melt_cheese', cat: 'sandwich', name: '香濃雙層熔岩起司吐司 (蛋奶素)', desc: '熱騰騰金黃牽絲雙起司，起司控首選', price: 95, hasCustom: false },
+      { id: 'sw_beef', cat: 'sandwich', name: '法式芥末籽烤牛肉吐司', desc: '特調第戎芥末籽醬佐香嫩烤牛肉片', price: 95, hasCustom: false },
+      { id: 'sw_tuna_corn', cat: 'sandwich', name: '鮮甜鮪魚玉米吐司', desc: '特調鮮甜多汁鮪魚玉米餡料', price: 95, hasCustom: false },
+
+      // 7. 雙片生吐司與點心 (輕食：直接加入)
+      { id: 'toast_sweet_potato', cat: 'toast', name: '凍餡台農57號蜂蜜地瓜生吐司', desc: '2片1份，台農57號蜜香黃金地瓜餡', price: 65, hasCustom: false },
+      { id: 'toast_taro_pork', cat: 'toast', name: '凍餡芋頭肉鬆生吐司', desc: '2片1份，大甲芋泥搭香酥肉鬆絕配', price: 65, hasCustom: false },
+      { id: 'toast_choco', cat: 'toast', name: '凍餡法式生巧克力生吐司', desc: '2片1份，法式濃濃苦甜生巧餡', price: 65, hasCustom: false },
+      { id: 'toast_roasted_tea', cat: 'toast', name: '職人手炒焙茶奶酥生吐司', desc: '2片1份，炭香焙茶香脆奶酥', price: 65, hasCustom: false }
     ];
 
-    // 請替換為你的 LIFF ID (從 LINE Developers 取得)
+    // 已綁定你的專屬 LIFF ID[cite: 1]
     const MY_LIFF_ID = "2011673074-haQCo3WA";
+    
     let currentCategory = 'all';
+    let cart = [];
 
-    // 渲染菜單
+    let activeItem = null;
+    let selectedTemp = '冰';
+    let selectedIce = '微冰';
+    let selectedSugar = '無糖';
+    let modalCount = 1;
+
+    // 渲染菜單品項
     function renderMenu() {
       const container = document.getElementById('menu-container');
       container.innerHTML = '';
@@ -310,17 +473,15 @@
             <div class="item-desc">${item.desc}</div>
             <div class="item-price">$${item.price}</div>
           </div>
-          <div class="counter">
-            <button class="btn-qty" onclick="changeQty('${item.id}', -1)">-</button>
-            <span class="qty-num" id="qty-${item.id}">${item.qty}</span>
-            <button class="btn-qty" onclick="changeQty('${item.id}', 1)">+</button>
-          </div>
+          <button class="btn-add" onclick="openItemModal('${item.id}')">
+            + 選擇
+          </button>
         `;
         container.appendChild(div);
       });
     }
 
-    // 分類切換
+    // 分類導覽切換
     function switchCategory(cat) {
       currentCategory = cat;
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -328,25 +489,159 @@
       renderMenu();
     }
 
-    // 杯數加減
-    function changeQty(id, delta) {
+    // 開啟規格彈窗
+    function openItemModal(id) {
       const item = menuItems.find(i => i.id === id);
-      if (item && item.qty + delta >= 0) {
-        item.qty += delta;
-        const el = document.getElementById(`qty-${id}`);
-        if (el) el.innerText = item.qty;
-        updateSummary();
+      if (!item) return;
+
+      if (!item.hasCustom) {
+        addToCart(item, '', 1);
+        return;
+      }
+
+      activeItem = item;
+      modalCount = 1;
+      selectedTemp = '冰';
+      selectedIce = '微冰';
+      selectedSugar = '無糖';
+
+      document.getElementById('modalItemName').innerText = item.name;
+      document.getElementById('modalItemPrice').innerText = '$' + item.price;
+      document.getElementById('modalQty').innerText = modalCount;
+
+      document.getElementById('iceGroup').style.display = 'block';
+      if (item.allowSugar) {
+        document.getElementById('sugarGroup').style.display = 'block';
+      } else {
+        document.getElementById('sugarGroup').style.display = 'none';
+      }
+
+      resetChips();
+      document.getElementById('specModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('specModal').style.display = 'none';
+    }
+
+    function resetChips() {
+      document.querySelectorAll('#tempGroup .chip-btn').forEach(b => b.classList.remove('selected'));
+      document.getElementById('opt-temp-ice').classList.add('selected');
+
+      document.querySelectorAll('#iceGroup .chip-btn').forEach(b => {
+        b.classList.toggle('selected', b.innerText.includes('微冰'));
+      });
+      document.querySelectorAll('#sugarGroup .chip-btn').forEach(b => {
+        b.classList.toggle('selected', b.innerText.includes('無糖'));
+      });
+    }
+
+    // 溫度切換 (選熱飲時隱藏冰塊)
+    function selectTemp(temp) {
+      selectedTemp = temp;
+      document.querySelectorAll('#tempGroup .chip-btn').forEach(b => b.classList.remove('selected'));
+      event.target.classList.add('selected');
+
+      if (temp === '熱') {
+        document.getElementById('iceGroup').style.display = 'none';
+      } else {
+        document.getElementById('iceGroup').style.display = 'block';
       }
     }
 
-    // 更新總金額
-    function updateSummary() {
+    function selectIce(ice) {
+      selectedIce = ice;
+      document.querySelectorAll('#iceGroup .chip-btn').forEach(b => b.classList.remove('selected'));
+      event.target.classList.add('selected');
+    }
+
+    function selectSugar(sugar) {
+      selectedSugar = sugar;
+      document.querySelectorAll('#sugarGroup .chip-btn').forEach(b => b.classList.remove('selected'));
+      event.target.classList.add('selected');
+    }
+
+    function changeModalQty(delta) {
+      if (modalCount + delta >= 1) {
+        modalCount += delta;
+        document.getElementById('modalQty').innerText = modalCount;
+      }
+    }
+
+    // 確認彈窗加入
+    function confirmAddToCart() {
+      if (!activeItem) return;
+
+      let specParts = [];
+      if (selectedTemp === '熱') {
+        specParts.push('熱');
+      } else {
+        specParts.push(`冰/${selectedIce}`);
+      }
+
+      if (activeItem.allowSugar) {
+        specParts.push(selectedSugar);
+      }
+
+      const specText = specParts.join('/');
+      addToCart(activeItem, specText, modalCount);
+      closeModal();
+    }
+
+    // 加入購物車
+    function addToCart(item, specText, qty) {
+      const existing = cart.find(c => c.id === item.id && c.specText === specText);
+      if (existing) {
+        existing.qty += qty;
+      } else {
+        cart.push({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          specText: specText,
+          qty: qty
+        });
+      }
+      renderCart();
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      renderCart();
+    }
+
+    // 更新購物車顯示
+    function renderCart() {
+      const container = document.getElementById('cart-container');
+      if (cart.length === 0) {
+        container.innerHTML = '<div style="font-size: 13px; color: #ADB5BD; text-align: center; padding: 12px 0;">尚未選擇餐點，請點擊上方「+ 選擇」</div>';
+        document.getElementById('total-qty').innerText = 0;
+        document.getElementById('total-amount').innerText = '$0';
+        return;
+      }
+
+      let html = '';
       let totalQty = 0;
       let totalAmount = 0;
-      menuItems.forEach(item => {
+
+      cart.forEach((item, index) => {
         totalQty += item.qty;
         totalAmount += item.qty * item.price;
+        html += `
+          <div class="cart-item">
+            <div>
+              <div class="cart-item-title">${item.name} x ${item.qty}</div>
+              ${item.specText ? `<span class="cart-item-spec">${item.specText}</span>` : ''}
+            </div>
+            <div class="cart-item-right">
+              <span class="cart-item-price">$${item.qty * item.price}</span>
+              <button class="btn-del" onclick="removeCartItem(${index})">✕</button>
+            </div>
+          </div>
+        `;
       });
+
+      container.innerHTML = html;
       document.getElementById('total-qty').innerText = totalQty;
       document.getElementById('total-amount').innerText = '$' + totalAmount;
     }
@@ -369,10 +664,9 @@
         });
     };
 
-    // 點擊確認送出外送單
+    // 送出外送訂單
     function submitOrder() {
-      const selected = menuItems.filter(i => i.qty > 0);
-      if (selected.length === 0) {
+      if (cart.length === 0) {
         alert("請至少選擇 1 項外送餐點！");
         return;
       }
@@ -400,9 +694,15 @@
         return;
       }
 
-      const itemStrings = selected.map(i => `${i.name}*${i.qty}`);
+      // 組裝格式：品項(規格)*數量
+      const itemStrings = cart.map(item => {
+        if (item.specText) {
+          return `${item.name}(${item.specText})*${item.qty}`;
+        }
+        return `${item.name}*${item.qty}`;
+      });
 
-      // 組成與現有 n8n 正則表達式相符的文字格式
+      // 符合既有 n8n 正則表達式格式[cite: 1]
       let messageText = `#外送\n`;
       messageText += `訂購人：${name}\n`;
       messageText += `分機/電話：${phone}\n`;
@@ -414,20 +714,19 @@
       document.getElementById('submit-btn').disabled = true;
       document.getElementById('submit-btn').innerText = "訂單送出中...";
 
-      // 呼叫 LINE LIFF API 代表客戶發送訊息
       if (liff.isInClient()) {
         liff.sendMessages([{
           type: 'text',
           text: messageText
         }]).then(() => {
-          liff.closeWindow(); // 成功送出後自動關閉頁面
+          liff.closeWindow();
         }).catch(err => {
           alert("送出失敗：" + err.message);
           document.getElementById('submit-btn').disabled = false;
           document.getElementById('submit-btn').innerText = "確認送出外送單";
         });
       } else {
-        alert("【測試模式】非 LINE 內部開啟，送出內容如下：\n\n" + messageText);
+        alert("【測試模式】送出內容如下：\n\n" + messageText);
         document.getElementById('submit-btn').disabled = false;
         document.getElementById('submit-btn').innerText = "確認送出外送單";
       }
